@@ -1,0 +1,16 @@
+#!/bin/sh
+
+echo "🔍 Ejecutando checks pre-commit..."
+
+# 1. Scan de secretos con detect-secrets o grep básico
+echo "Verificando que no hay secrets hardcoded..."
+if git diff --cached | grep -E "(password|secret|api_key|token)\s*=\s*['\"][^'\"]{8,}" --ignore-case; then
+  echo "❌ ERROR: Posible secret detectado. Revisa tus cambios."
+  exit 1
+fi
+
+# 2. Verificar que no hay ficheros .env staged
+if git diff --cached --name-only | grep -E "^\.env$|^\.env\."; then
+  echo "❌ ERROR: Intentando commitear un fichero .env. Añádelo al .gitignore."
+  exit 1
+fi
